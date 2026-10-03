@@ -255,7 +255,7 @@ export default function ReceiverPage() {
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           {/* 사용 가이드 버튼 */}
           <a
-            href="https://your-notion-guide-url"
+            href="https://com-study.notion.site/Direct-Drive-3ee29cd9f9d88050b8f6fd3f437962f0?source=copy_link"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#c4c7c5] hover:border-[#0b57d0] hover:bg-[#e8f0fe] text-[#444746] hover:text-[#0b57d0] text-xs font-medium transition"
@@ -323,7 +323,7 @@ export default function ReceiverPage() {
                 disabled={selectedIds.length === 0}
                 className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-[#0b57d0] text-white text-xs font-medium hover:bg-[#0842a0] disabled:opacity-40 transition shadow-sm"
               >
-                선택 ({selectedIds.length})
+                선택 받기 ({selectedIds.length})
               </button>
               <button
                 type="button"
@@ -384,7 +384,7 @@ export default function ReceiverPage() {
                               download={file.name}
                               className="text-[11px] sm:text-xs text-[#0b57d0] hover:underline"
                             >
-                              저장
+                              다시 저장
                             </a>
                           )}
                         </div>
@@ -430,7 +430,7 @@ export default function ReceiverPage() {
 
           <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[#747775] text-[10px] sm:text-[11px]">
             <a
-              href="https://your-notion-guide-url"
+              href="https://com-study.notion.site/Direct-Drive-3ee29cd9f9d88050b8f6fd3f437962f0?source=copy_link"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:underline hover:text-[#0b57d0] font-medium"
