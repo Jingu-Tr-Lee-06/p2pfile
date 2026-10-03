@@ -19,6 +19,9 @@ interface TransferStatus {
   isStreamMode?: boolean;
 }
 
+// 1GB (1024 * 1024 * 1024 바이트) 기준치 설정
+const LARGE_FILE_THRESHOLD = 1024 * 1024 * 1024;
+
 export default function ReceiverPage() {
   const [targetRoomId, setTargetRoomId] = useState<string>("");
   const [activeRoomId, setActiveRoomId] = useState<string>("");
@@ -29,9 +32,9 @@ export default function ReceiverPage() {
 
   const connRef = useRef<DataConnection | null>(null);
 
-  // 1) 4GB 미만 또는 미지원 환경(모바일 등)용 RAM 버퍼 폴백
+  // 1) 1GB 미만 또는 미지원 환경용 RAM 버퍼
   const activeBuffersRef = useRef<{ [fileId: string]: Blob[] }>({});
-  // 2) 5GB+ 무제한 용량 지원용 FileSystem Writable Stream 레퍼런스
+  // 2) 1GB 이상 초대용량 안전 처리를 위한 디스크 스트림 레퍼런스
   const activeStreamsRef = useRef<{ [fileId: string]: FileSystemWritableFileStream }>({});
 
   const remoteFilesRef = useRef<RemoteFile[]>([]);
@@ -74,7 +77,7 @@ export default function ReceiverPage() {
       return;
     }
 
-    // 2) 메모리 Blob 방식 종료 (기존 폴백 브라우저 다운로드)
+    // 2) 메모리 Blob 방식 종료 (원클릭 자동 다운로드)
     const targetMeta = remoteFilesRef.current.find((f) => f.id === fileId);
     if (!targetMeta || !activeBuffersRef.current[fileId]) return;
 
@@ -129,7 +132,7 @@ export default function ReceiverPage() {
         } else if (data.type === "file_chunk") {
           const { fileId, data: chunkData, index, total } = data;
 
-          // 디스크 직결 스트림이 열려 있는 경우 RAM에 쌓지 않고 디스크로 바로 기록
+          // 디스크 직결 스트림이 열려 있는 경우 RAM에 적재하지 않고 디스크로 직접 기록
           if (activeStreamsRef.current[fileId]) {
             try {
               await activeStreamsRef.current[fileId].write(chunkData);
@@ -137,7 +140,7 @@ export default function ReceiverPage() {
               console.error("디스크 쓰기 실패:", err);
             }
           } else {
-            // 폴백: RAM 버퍼에 누적
+            // 1GB 미만 소/중용량 파일: RAM 버퍼에 누적
             if (!activeBuffersRef.current[fileId]) {
               activeBuffersRef.current[fileId] = [];
             }
@@ -182,6 +185,7 @@ export default function ReceiverPage() {
     }
   }, []);
 
+  // [핵심] 1GB 미만은 팝업 없이 즉시 다운로드 / 1GB 이상만 저장 경로 팝업
   const triggerDownload = async (fileId: string) => {
     if (!connRef.current?.open) return;
     const targetFile = remoteFilesRef.current.find((f) => f.id === fileId);
@@ -189,8 +193,8 @@ export default function ReceiverPage() {
 
     let useDiskStream = false;
 
-    // File System Access API 지원 여부 확인 (PC Chrome/Edge 등)
-    if ("showSaveFilePicker" in window) {
+    // 1GB 이상이면서 File System Access API 지원 브라우저일 때만 저장창 실행
+    if (targetFile.size >= LARGE_FILE_THRESHOLD && "showSaveFilePicker" in window) {
       try {
         const handle = await (window as any).showSaveFilePicker({
           suggestedName: targetFile.name,
@@ -200,7 +204,7 @@ export default function ReceiverPage() {
         useDiskStream = true;
       } catch (err: any) {
         if (err.name === "AbortError") {
-          // 사용자가 파일 저장 위치 선택 창에서 취소를 누른 경우
+          // 사용자가 파일 저장 취소를 누른 경우 전송 요청 안 함
           return;
         }
         console.warn("디스크 직결 모드 실패, RAM 메모리 모드로 자동 폴백", err);
@@ -249,6 +253,20 @@ export default function ReceiverPage() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          {/* 사용 가이드 버튼 */}
+          <a
+            href="https://your-notion-guide-url"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#c4c7c5] hover:border-[#0b57d0] hover:bg-[#e8f0fe] text-[#444746] hover:text-[#0b57d0] text-xs font-medium transition"
+            title="사용 가이드 열기"
+          >
+            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0b57d0]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M12 18h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="hidden sm:inline">사용 가이드</span>
+          </a>
+
           <div className="flex items-center bg-[#f1f3f4] p-0.5 sm:p-1 rounded-xl border border-[#e1e3e1]">
             <Link
               href="/"
@@ -395,7 +413,7 @@ export default function ReceiverPage() {
         </div>
       </main>
 
-      {/* 푸터: Notion 연동 및 모바일 반응형 최적화 */}
+      {/* 푸터 */}
       <footer className="w-full border-t border-[#e1e3e1] bg-white py-6 sm:py-8 mt-8 sm:mt-12 text-[#444746] text-xs">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col items-center justify-center gap-2 sm:gap-2.5 text-center">
           <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1">
@@ -411,6 +429,15 @@ export default function ReceiverPage() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[#747775] text-[10px] sm:text-[11px]">
+            <a
+              href="https://your-notion-guide-url"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline hover:text-[#0b57d0] font-medium"
+            >
+              사용 설명서
+            </a>
+            <span className="text-[#c4c7c5] select-none">|</span>
             <a
               href="https://com-study.notion.site/Direct-Drive-3ee29cd9f9d8804ababac8c84c25ce13?source=copy_link"
               target="_blank"
