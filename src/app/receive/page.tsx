@@ -16,6 +16,7 @@ interface TransferStatus {
   progress: number;
   done: boolean;
   blobUrl?: string;
+  isStreamMode?: boolean;
 }
 
 export default function ReceiverPage() {
@@ -27,9 +28,13 @@ export default function ReceiverPage() {
   const [status, setStatus] = useState<string>("대기 중");
 
   const connRef = useRef<DataConnection | null>(null);
-  const activeBuffersRef = useRef<{ [fileId: string]: Blob[] }>({});
-  const remoteFilesRef = useRef<RemoteFile[]>([]);
 
+  // 1) 4GB 미만 또는 미지원 환경(모바일 등)용 RAM 버퍼 폴백
+  const activeBuffersRef = useRef<{ [fileId: string]: Blob[] }>({});
+  // 2) 5GB+ 무제한 용량 지원용 FileSystem Writable Stream 레퍼런스
+  const activeStreamsRef = useRef<{ [fileId: string]: FileSystemWritableFileStream }>({});
+
+  const remoteFilesRef = useRef<RemoteFile[]>([]);
   remoteFilesRef.current = fileList;
 
   const fetchMyGeoIp = async () => {
@@ -52,7 +57,24 @@ export default function ReceiverPage() {
     }
   };
 
-  const finalizeDownload = (fileId: string) => {
+  const finalizeDownload = async (fileId: string) => {
+    // 1) 디스크 스트림 방식 종료 (파일 저장 완료)
+    if (activeStreamsRef.current[fileId]) {
+      try {
+        await activeStreamsRef.current[fileId].close();
+      } catch (err) {
+        console.error("디스크 스트림 닫기 오류:", err);
+      }
+      delete activeStreamsRef.current[fileId];
+
+      setTransfers((prev) => ({
+        ...prev,
+        [fileId]: { progress: 100, done: true, isStreamMode: true },
+      }));
+      return;
+    }
+
+    // 2) 메모리 Blob 방식 종료 (기존 폴백 브라우저 다운로드)
     const targetMeta = remoteFilesRef.current.find((f) => f.id === fileId);
     if (!targetMeta || !activeBuffersRef.current[fileId]) return;
 
@@ -76,7 +98,7 @@ export default function ReceiverPage() {
 
     setTransfers((prev) => ({
       ...prev,
-      [fileId]: { progress: 100, done: true, blobUrl: url },
+      [fileId]: { progress: 100, done: true, blobUrl: url, isStreamMode: false },
     }));
   };
 
@@ -101,29 +123,44 @@ export default function ReceiverPage() {
         });
       });
 
-      conn.on("data", (data: any) => {
+      conn.on("data", async (data: any) => {
         if (data.type === "manifest") {
           setFileList(data.files);
         } else if (data.type === "file_chunk") {
           const { fileId, data: chunkData, index, total } = data;
-          if (!activeBuffersRef.current[fileId]) {
-            activeBuffersRef.current[fileId] = [];
+
+          // 디스크 직결 스트림이 열려 있는 경우 RAM에 쌓지 않고 디스크로 바로 기록
+          if (activeStreamsRef.current[fileId]) {
+            try {
+              await activeStreamsRef.current[fileId].write(chunkData);
+            } catch (err) {
+              console.error("디스크 쓰기 실패:", err);
+            }
+          } else {
+            // 폴백: RAM 버퍼에 누적
+            if (!activeBuffersRef.current[fileId]) {
+              activeBuffersRef.current[fileId] = [];
+            }
+            activeBuffersRef.current[fileId].push(new Blob([chunkData]));
           }
-          activeBuffersRef.current[fileId].push(new Blob([chunkData]));
 
           const isLastChunk = index + 1 === total;
           const currentProg = isLastChunk ? 100 : Math.min(99, Math.round(((index + 1) / total) * 100));
 
           setTransfers((prev) => ({
             ...prev,
-            [fileId]: { progress: currentProg, done: isLastChunk ? true : false },
+            [fileId]: {
+              ...prev[fileId],
+              progress: currentProg,
+              done: isLastChunk ? true : false,
+            },
           }));
 
           if (isLastChunk) {
-            finalizeDownload(fileId);
+            await finalizeDownload(fileId);
           }
         } else if (data.type === "file_done") {
-          finalizeDownload(data.fileId);
+          await finalizeDownload(data.fileId);
         }
       });
 
@@ -145,29 +182,53 @@ export default function ReceiverPage() {
     }
   }, []);
 
-  const triggerDownload = (fileId: string) => {
+  const triggerDownload = async (fileId: string) => {
     if (!connRef.current?.open) return;
+    const targetFile = remoteFilesRef.current.find((f) => f.id === fileId);
+    if (!targetFile) return;
+
+    let useDiskStream = false;
+
+    // File System Access API 지원 여부 확인 (PC Chrome/Edge 등)
+    if ("showSaveFilePicker" in window) {
+      try {
+        const handle = await (window as any).showSaveFilePicker({
+          suggestedName: targetFile.name,
+        });
+        const writable = await handle.createWritable();
+        activeStreamsRef.current[fileId] = writable;
+        useDiskStream = true;
+      } catch (err: any) {
+        if (err.name === "AbortError") {
+          // 사용자가 파일 저장 위치 선택 창에서 취소를 누른 경우
+          return;
+        }
+        console.warn("디스크 직결 모드 실패, RAM 메모리 모드로 자동 폴백", err);
+      }
+    }
+
     setTransfers((prev) => ({
       ...prev,
-      [fileId]: { progress: 0, done: false },
+      [fileId]: { progress: 0, done: false, isStreamMode: useDiskStream },
     }));
+
     connRef.current.send({ type: "request_file", fileId });
   };
 
-  const handleDownloadSelected = () => {
-    selectedIds.forEach((fileId) => {
+  const handleDownloadSelected = async () => {
+    for (const fileId of selectedIds) {
       if (!transfers[fileId]?.done) {
-        triggerDownload(fileId);
+        await triggerDownload(fileId);
       }
-    });
+    }
   };
 
-  const handleDownloadAll = () => {
-    fileList.forEach((file) => {
+  const handleDownloadAll = async () => {
+    for (const file of fileList) {
       if (!transfers[file.id]?.done) {
-        triggerDownload(file.id);
+        await triggerDownload(file.id);
       }
-    });
+    }
   };
 
   return (
@@ -205,12 +266,10 @@ export default function ReceiverPage() {
       </header>
 
       <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
-        {/* 모바일 최적화 상태 바 */}
         <div className="md:hidden text-xs text-[#747775] text-center bg-white border border-[#e1e3e1] py-2 px-3 rounded-xl shadow-xs">
           {status}
         </div>
 
-        {/* 코드 입력 카드 */}
         <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#e1e3e1] shadow-sm p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div className="min-w-0">
             <div className="text-sm font-semibold text-[#1f1f1f]">공유 코드 수동 입력</div>
@@ -234,7 +293,6 @@ export default function ReceiverPage() {
           </div>
         </div>
 
-        {/* 파일 목록 컨테이너 */}
         <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#e1e3e1] shadow-sm overflow-hidden">
           <div className="p-3 sm:p-4 border-b border-[#e1e3e1] flex items-center justify-between bg-[#f8fafd] gap-2">
             <div className="text-xs font-medium text-[#444746] truncate">
@@ -290,7 +348,8 @@ export default function ReceiverPage() {
                         <div className="text-[11px] sm:text-xs text-[#747775] truncate">
                           {(file.size / 1024 / 1024).toFixed(2)} MB
                           {transfer && !transfer.done && ` • ${transfer.progress}%`}
-                          {transfer?.done && ` • 완료`}
+                          {transfer?.done && ` • 완료 (저장됨)`}
+                          {transfer?.isStreamMode && ` [Disk Direct]`}
                         </div>
                       </div>
                     </div>
@@ -336,27 +395,22 @@ export default function ReceiverPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="w-full border-t border-[#e1e3e1] bg-white py-8 mt-12 text-[#444746] text-xs">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col items-center justify-center gap-2.5">
-          {/* 상단 라인: 브랜드명 | 슬로건 | 문의 이메일 */}
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
-            <span className="font-bold text-[#1f1f1f] text-sm">Direct Drive</span>
-            <span className="text-[#747775]">Direct Drive</span>
+      {/* 푸터: Notion 연동 및 모바일 반응형 최적화 */}
+      <footer className="w-full border-t border-[#e1e3e1] bg-white py-6 sm:py-8 mt-8 sm:mt-12 text-[#444746] text-xs">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col items-center justify-center gap-2 sm:gap-2.5 text-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1">
+            <span className="font-bold text-[#1f1f1f] text-xs sm:text-sm">Direct Drive</span>
+            <span className="text-[#747775] text-[11px] sm:text-xs">P2P File Share Platform</span>
             <span className="text-[#c4c7c5] select-none">|</span>
-            <span>
+            <span className="text-[11px] sm:text-xs">
               사이트 관련 문의 :{" "}
-              <a
-                href="mailto:devlee92736@gmail.com"
-                className="text-[#0b57d0] hover:underline"
-              >
+              <a href="mailto:devlee92736@gmail.com" className="text-[#0b57d0] hover:underline">
                 devlee92736@gmail.com
               </a>
             </span>
           </div>
 
-          {/* 하단 라인: 노션 링크 연결 (새 탭으로 열기) | 카피라이트 */}
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[#747775] text-[11px] text-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[#747775] text-[10px] sm:text-[11px]">
             <a
               href="https://com-study.notion.site/Direct-Drive-3ee29cd9f9d8804ababac8c84c25ce13?source=copy_link"
               target="_blank"
@@ -375,9 +429,7 @@ export default function ReceiverPage() {
               서비스이용약관
             </a>
             <span className="text-[#c4c7c5] select-none">|</span>
-            <span>
-              © 2026 Direct Drive, Inc. All rights reserved powered by JH's SW Lab
-            </span>
+            <span>© 2026 Direct Drive, Inc. All rights reserved powered by JH's SW Lab</span>
           </div>
         </div>
       </footer>

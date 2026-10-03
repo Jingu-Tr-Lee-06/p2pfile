@@ -347,7 +347,7 @@ export default function SenderPage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafd] text-[#1f1f1f] flex flex-col font-sans overflow-x-hidden">
-      {/* 헤더: 모바일 최적화 */}
+      {/* 헤더: 설명서 버튼 + 모드 전환 토글 포함 */}
       <header className="h-16 border-b border-[#e1e3e1] bg-white px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center bg-[#e8f0fe] text-[#0b57d0] flex-shrink-0">
@@ -363,7 +363,21 @@ export default function SenderPage() {
           </div>
         </div>
 
+        {/* 헤더 우측: 사용 가이드 버튼 + 모드 전환 탭 */}
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <a
+            href="https://your-notion-guide-url"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#c4c7c5] hover:border-[#0b57d0] hover:bg-[#e8f0fe] text-[#444746] hover:text-[#0b57d0] text-xs font-medium transition"
+            title="사용 가이드 열기"
+          >
+            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0b57d0]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M12 18h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="hidden sm:inline">사용 가이드</span>
+          </a>
+
           <div className="flex items-center bg-[#f1f3f4] p-0.5 sm:p-1 rounded-xl border border-[#e1e3e1]">
             <span className="px-2.5 sm:px-3 py-1 bg-white text-[#0b57d0] text-xs font-semibold rounded-lg shadow-sm">
               Send
@@ -385,7 +399,7 @@ export default function SenderPage() {
         </div>
       </header>
 
-      {/* 메인 레이아웃: 반응형 패딩 적용 */}
+      {/* 메인 레이아웃 */}
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
         {/* 1. 세션명 설정 패널 */}
         <div className="bg-white border border-[#e1e3e1] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
@@ -415,7 +429,6 @@ export default function SenderPage() {
         {/* 2. 세션 활성화 및 텔레메트리 모니터링 카드 */}
         {shareUrl && (
           <div className="bg-white border border-[#e1e3e1] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-5">
-            {/* 세션 상태 및 링크 복사 영역 */}
             <div className="flex flex-col gap-3 pb-4 border-b border-[#e1e3e1]">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
@@ -437,7 +450,6 @@ export default function SenderPage() {
                 </div>
               </div>
 
-              {/* 링크 인풋 + 복사 버튼 */}
               <div className="flex gap-2 w-full">
                 <input
                   readOnly
@@ -455,7 +467,6 @@ export default function SenderPage() {
               </div>
             </div>
 
-            {/* 텔레메트리 메트릭 그리드 (모바일 2열, PC 4열 대응) */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 text-xs font-mono">
               <div className="p-3 bg-[#f8fafd] rounded-xl border border-[#e1e3e1] min-w-0">
                 <div className="text-[10px] text-[#747775] uppercase truncate">전송 속도 / 누적량</div>
@@ -492,7 +503,6 @@ export default function SenderPage() {
               </div>
             </div>
 
-            {/* CMD 터미널 로그 콘솔: 모바일 줄바꿈 및 오버플로우 방지 */}
             <div className="space-y-1.5 pt-1">
               <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-[#747775] px-1">
                 <span>TUNNEL TELEMETRY CONSOLE</span>
@@ -621,27 +631,31 @@ export default function SenderPage() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="w-full border-t border-[#e1e3e1] bg-white py-8 mt-12 text-[#444746] text-xs">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col items-center justify-center gap-2.5">
-          {/* 상단 라인: 브랜드명 | 슬로건 | 문의 이메일 */}
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
-            <span className="font-bold text-[#1f1f1f] text-sm">Direct Drive</span>
-            <span className="text-[#747775]">Direct Drive</span>
+      {/* 푸터: Notion 설명서 링크 연동 및 반응형 적용 */}
+      <footer className="w-full border-t border-[#e1e3e1] bg-white py-6 sm:py-8 mt-8 sm:mt-12 text-[#444746] text-xs">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col items-center justify-center gap-2 sm:gap-2.5 text-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1">
+            <span className="font-bold text-[#1f1f1f] text-xs sm:text-sm">Direct Drive</span>
+            <span className="text-[#747775] text-[11px] sm:text-xs">P2P File Share Platform</span>
             <span className="text-[#c4c7c5] select-none">|</span>
-            <span>
+            <span className="text-[11px] sm:text-xs">
               사이트 관련 문의 :{" "}
-              <a
-                href="mailto:devlee92736@gmail.com"
-                className="text-[#0b57d0] hover:underline"
-              >
+              <a href="mailto:devlee92736@gmail.com" className="text-[#0b57d0] hover:underline">
                 devlee92736@gmail.com
               </a>
             </span>
           </div>
 
-          {/* 하단 라인: 노션 링크 연결 (새 탭으로 열기) | 카피라이트 */}
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[#747775] text-[11px] text-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[#747775] text-[10px] sm:text-[11px]">
+            <a
+              href="https://com-study.notion.site/Direct-Drive-3ee29cd9f9d88050b8f6fd3f437962f0?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline hover:text-[#0b57d0] font-medium"
+            >
+              사용 설명서
+            </a>
+            <span className="text-[#c4c7c5] select-none">|</span>
             <a
               href="https://com-study.notion.site/Direct-Drive-3ee29cd9f9d8804ababac8c84c25ce13?source=copy_link"
               target="_blank"
@@ -660,9 +674,7 @@ export default function SenderPage() {
               서비스이용약관
             </a>
             <span className="text-[#c4c7c5] select-none">|</span>
-            <span>
-              © 2026 Direct Drive, Inc. All rights reserved powered by JH's SW Lab
-            </span>
+            <span>© 2026 Direct Drive, Inc. All rights reserved powered by JH's SW Lab</span>
           </div>
         </div>
       </footer>
