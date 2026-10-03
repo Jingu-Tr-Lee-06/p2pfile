@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "End-to-End Encrypted 10-Minute Ephemeral File Tunnel",
   openGraph: {
     title: "Direct Drive",
-    description: "End-to-End Encrypted 10-Minute Ephemeral File Tunnel",
+    description: "P2P File Share Platform",
     url: "https://knu-directdrive.vercel.app",
     siteName: "Direct Drive",
     type: "website",

@@ -366,7 +366,7 @@ export default function SenderPage() {
         {/* 헤더 우측: 사용 가이드 버튼 + 모드 전환 탭 */}
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           <a
-            href="https://your-notion-guide-url"
+            href="https://com-study.notion.site/Direct-Drive-3ee29cd9f9d88050b8f6fd3f437962f0?source=copy_link"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#c4c7c5] hover:border-[#0b57d0] hover:bg-[#e8f0fe] text-[#444746] hover:text-[#0b57d0] text-xs font-medium transition"
