@@ -4,6 +4,13 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Direct Drive",
   description: "End-to-End Encrypted 10-Minute Ephemeral File Tunnel",
+  openGraph: {
+    title: "Direct Drive",
+    description: "End-to-End Encrypted 10-Minute Ephemeral File Tunnel",
+    url: "https://knu-directdrive.vercel.app",
+    siteName: "Direct Drive",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {
