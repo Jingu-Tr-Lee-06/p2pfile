@@ -119,7 +119,6 @@ export default function ReceiverPage() {
             [fileId]: { progress: currentProg, done: isLastChunk ? true : false },
           }));
 
-          // 마지막 청크면 즉시 다운로드 완결 실행
           if (isLastChunk) {
             finalizeDownload(fileId);
           }
@@ -173,6 +172,7 @@ export default function ReceiverPage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafd] text-[#1f1f1f] flex flex-col font-sans">
+      {/* 헤더: Send / Receive 전환 토글 버튼 */}
       <header className="h-16 border-b border-[#e1e3e1] bg-white px-6 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#e8f0fe] text-[#0b57d0]">
@@ -182,10 +182,25 @@ export default function ReceiverPage() {
           </div>
           <div>
             <span className="text-lg font-medium text-[#1f1f1f]">Direct Drive</span>
-            <span className="ml-2 text-xs font-mono px-2 py-0.5 rounded-full bg-[#e8f0fe] text-[#0b57d0] font-medium">수신 모드</span>
+            <span className="ml-2 text-xs font-mono px-2 py-0.5 rounded-full bg-[#e8f0fe] text-[#0b57d0] font-medium">Receive Mode</span>
           </div>
         </div>
-        <div className="text-xs text-[#747775]">{status}</div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex items-center bg-[#f1f3f4] p-1 rounded-xl border border-[#e1e3e1]">
+            <Link
+              href="/"
+              className="px-3 py-1 text-[#444746] hover:text-[#1f1f1f] text-xs font-medium rounded-lg transition"
+            >
+              Send
+            </Link>
+            <span className="px-3 py-1 bg-white text-[#0b57d0] text-xs font-semibold rounded-lg shadow-sm">
+              Receive
+            </span>
+          </div>
+
+          <div className="hidden sm:block text-xs text-[#747775]">{status}</div>
+        </div>
       </header>
 
       <main className="flex-1 max-w-4xl w-full mx-auto p-6 sm:p-10 space-y-6">

@@ -327,7 +327,6 @@ export default function SenderPage() {
       }
     }
 
-    // 버퍼 데드락 방지: 안전 대기 후 즉시 file_done 발송
     await new Promise((resolve) => setTimeout(resolve, 60));
 
     const totalDurationSec = Math.max((performance.now() - streamStartTime) / 1000, 0.001);
@@ -348,6 +347,7 @@ export default function SenderPage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafd] text-[#1f1f1f] flex flex-col font-sans">
+      {/* 헤더: 모드 전환 버튼(Send / Receive) 포함 */}
       <header className="h-16 border-b border-[#e1e3e1] bg-white px-6 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#e8f0fe] text-[#0b57d0]">
@@ -357,21 +357,35 @@ export default function SenderPage() {
           </div>
           <div>
             <span className="text-lg font-medium text-[#1f1f1f]">Direct Drive</span>
-            <span className="ml-2 text-xs font-mono px-2 py-0.5 rounded-full bg-[#e8f0fe] text-[#0b57d0] font-medium">Console Engine</span>
+            <span className="ml-2 text-xs font-mono px-2 py-0.5 rounded-full bg-[#e8f0fe] text-[#0b57d0] font-medium">Send Mode</span>
           </div>
         </div>
 
-        {shareUrl && (
-          <div className="flex items-center gap-3">
-            <div className="text-xs font-mono text-[#444746] bg-[#f1f3f4] px-3 py-1.5 rounded-full flex items-center gap-2">
+        {/* 상단 우측: Send / Receive 전환 토글 버튼 및 타이머 */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center bg-[#f1f3f4] p-1 rounded-xl border border-[#e1e3e1]">
+            <span className="px-3 py-1 bg-white text-[#0b57d0] text-xs font-semibold rounded-lg shadow-sm">
+              Send
+            </span>
+            <Link
+              href="/receive"
+              className="px-3 py-1 text-[#444746] hover:text-[#1f1f1f] text-xs font-medium rounded-lg transition"
+            >
+              Receive
+            </Link>
+          </div>
+
+          {shareUrl && (
+            <div className="hidden sm:flex text-xs font-mono text-[#444746] bg-[#f1f3f4] px-3 py-1.5 rounded-full items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#188038]" />
               <span>만료까지: {Math.floor(timeLeft / 60)}분 {timeLeft % 60}초</span>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </header>
 
       <main className="flex-1 max-w-5xl w-full mx-auto p-6 sm:p-10 space-y-6">
+        {/* 상단 1: 세션명/코드 입력 및 변경 패널 */}
         <div className="bg-white border border-[#e1e3e1] rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <div className="text-sm font-semibold text-[#1f1f1f]">공유 세션명 (접속 코드) 설정</div>
@@ -396,6 +410,7 @@ export default function SenderPage() {
           </div>
         </div>
 
+        {/* 상단 2: 세션 활성화 및 텔레메트리 모니터링 카드 */}
         {shareUrl && (
           <div className="bg-white border border-[#e1e3e1] rounded-3xl p-6 shadow-sm space-y-5">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#e1e3e1]">
@@ -486,6 +501,7 @@ export default function SenderPage() {
           </div>
         )}
 
+        {/* 파일 업로드 드롭존 */}
         <div
           onDragOver={(e) => {
             e.preventDefault();
@@ -520,6 +536,7 @@ export default function SenderPage() {
           </label>
         </div>
 
+        {/* 파일 목록 카드 */}
         {fileList.length > 0 && (
           <div className="bg-white rounded-3xl border border-[#e1e3e1] shadow-sm overflow-hidden">
             <div className="p-4 border-b border-[#e1e3e1] flex items-center justify-between bg-[#f8fafd]">
@@ -590,6 +607,7 @@ export default function SenderPage() {
           </div>
         )}
       </main>
+
       {/* Footer */}
       <footer className="w-full border-t border-[#e1e3e1] bg-white py-8 mt-12 text-[#444746] text-xs">
         <div className="max-w-5xl mx-auto px-6 flex flex-col items-center justify-center gap-2.5">
