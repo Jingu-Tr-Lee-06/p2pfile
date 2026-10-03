@@ -346,37 +346,38 @@ export default function SenderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafd] text-[#1f1f1f] flex flex-col font-sans">
-      {/* 헤더: 모드 전환 버튼(Send / Receive) 포함 */}
-      <header className="h-16 border-b border-[#e1e3e1] bg-white px-6 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#e8f0fe] text-[#0b57d0]">
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <div className="min-h-screen bg-[#f8fafd] text-[#1f1f1f] flex flex-col font-sans overflow-x-hidden">
+      {/* 헤더: 모바일 최적화 */}
+      <header className="h-16 border-b border-[#e1e3e1] bg-white px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center bg-[#e8f0fe] text-[#0b57d0] flex-shrink-0">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
             </svg>
           </div>
-          <div>
-            <span className="text-lg font-medium text-[#1f1f1f]">Direct Drive</span>
-            <span className="ml-2 text-xs font-mono px-2 py-0.5 rounded-full bg-[#e8f0fe] text-[#0b57d0] font-medium">Send Mode</span>
+          <div className="truncate">
+            <span className="text-base sm:text-lg font-medium text-[#1f1f1f]">Direct Drive</span>
+            <span className="hidden xs:inline-block ml-1.5 sm:ml-2 text-[10px] sm:text-xs font-mono px-2 py-0.5 rounded-full bg-[#e8f0fe] text-[#0b57d0] font-medium">
+              Send
+            </span>
           </div>
         </div>
 
-        {/* 상단 우측: Send / Receive 전환 토글 버튼 및 타이머 */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center bg-[#f1f3f4] p-1 rounded-xl border border-[#e1e3e1]">
-            <span className="px-3 py-1 bg-white text-[#0b57d0] text-xs font-semibold rounded-lg shadow-sm">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center bg-[#f1f3f4] p-0.5 sm:p-1 rounded-xl border border-[#e1e3e1]">
+            <span className="px-2.5 sm:px-3 py-1 bg-white text-[#0b57d0] text-xs font-semibold rounded-lg shadow-sm">
               Send
             </span>
             <Link
               href="/receive"
-              className="px-3 py-1 text-[#444746] hover:text-[#1f1f1f] text-xs font-medium rounded-lg transition"
+              className="px-2.5 sm:px-3 py-1 text-[#444746] hover:text-[#1f1f1f] text-xs font-medium rounded-lg transition"
             >
               Receive
             </Link>
           </div>
 
           {shareUrl && (
-            <div className="hidden sm:flex text-xs font-mono text-[#444746] bg-[#f1f3f4] px-3 py-1.5 rounded-full items-center gap-2">
+            <div className="hidden md:flex text-xs font-mono text-[#444746] bg-[#f1f3f4] px-3 py-1.5 rounded-full items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#188038]" />
               <span>만료까지: {Math.floor(timeLeft / 60)}분 {timeLeft % 60}초</span>
             </div>
@@ -384,78 +385,89 @@ export default function SenderPage() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-5xl w-full mx-auto p-6 sm:p-10 space-y-6">
-        {/* 상단 1: 세션명/코드 입력 및 변경 패널 */}
-        <div className="bg-white border border-[#e1e3e1] rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
+      {/* 메인 레이아웃: 반응형 패딩 적용 */}
+      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
+        {/* 1. 세션명 설정 패널 */}
+        <div className="bg-white border border-[#e1e3e1] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+          <div className="min-w-0">
             <div className="text-sm font-semibold text-[#1f1f1f]">공유 세션명 (접속 코드) 설정</div>
-            <div className="text-xs text-[#747775] mt-0.5">상대방에게 전달할 맞춤형 코드를 직접 입력하세요.</div>
+            <div className="text-xs text-[#747775] mt-0.5 truncate">상대방에게 전달할 맞춤형 코드를 직접 입력하세요.</div>
           </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-xs font-mono text-[#747775]">/receive#</span>
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <span className="text-xs font-mono text-[#747775] flex-shrink-0">/receive#</span>
             <input
               type="text"
               value={customRoomId}
               onChange={(e) => setCustomRoomId(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ""))}
-              placeholder="세션 코드 입력"
-              className="bg-[#f8fafd] border border-[#c4c7c5] rounded-xl px-3 py-2 text-xs font-mono w-36 text-center font-bold text-[#0b57d0] focus:outline-none focus:border-[#0b57d0]"
+              placeholder="코드 입력"
+              className="bg-[#f8fafd] border border-[#c4c7c5] rounded-xl px-2.5 sm:px-3 py-2 text-xs font-mono flex-1 md:w-36 text-center font-bold text-[#0b57d0] focus:outline-none focus:border-[#0b57d0] min-w-0"
             />
             <button
               type="button"
               onClick={() => initSession(customRoomId)}
-              className="px-4 py-2 bg-[#0b57d0] hover:bg-[#0842a0] text-white text-xs font-medium rounded-xl transition shadow-sm whitespace-nowrap active:scale-95"
+              className="px-3.5 sm:px-4 py-2 bg-[#0b57d0] hover:bg-[#0842a0] text-white text-xs font-medium rounded-xl transition shadow-sm whitespace-nowrap active:scale-95 flex-shrink-0"
             >
               {shareUrl ? "코드 변경" : "세션 열기"}
             </button>
           </div>
         </div>
 
-        {/* 상단 2: 세션 활성화 및 텔레메트리 모니터링 카드 */}
+        {/* 2. 세션 활성화 및 텔레메트리 모니터링 카드 */}
         {shareUrl && (
-          <div className="bg-white border border-[#e1e3e1] rounded-3xl p-6 shadow-sm space-y-5">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#e1e3e1]">
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#188038] animate-pulse flex-shrink-0" />
-                <span className="text-sm font-semibold text-[#1f1f1f] whitespace-nowrap flex-shrink-0">
-                  터널 활성
-                </span>
-                <span className="text-xs text-[#747775] font-mono truncate max-w-[180px] sm:max-w-xs md:max-w-sm">
-                  ({status})
-                </span>
-                <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#e8f0fe] text-[#0b57d0] font-bold whitespace-nowrap flex-shrink-0">
-                  세션: {customRoomId}
-                </span>
+          <div className="bg-white border border-[#e1e3e1] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-5">
+            {/* 세션 상태 및 링크 복사 영역 */}
+            <div className="flex flex-col gap-3 pb-4 border-b border-[#e1e3e1]">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#188038] animate-pulse flex-shrink-0" />
+                  <span className="text-xs sm:text-sm font-semibold text-[#1f1f1f] whitespace-nowrap">
+                    터널 활성
+                  </span>
+                  <span className="text-xs text-[#747775] font-mono truncate max-w-[140px] sm:max-w-xs">
+                    ({status})
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#e8f0fe] text-[#0b57d0] font-bold whitespace-nowrap">
+                    코드: {customRoomId}
+                  </span>
+                  <span className="md:hidden text-[11px] font-mono text-[#747775] bg-[#f1f3f4] px-2 py-0.5 rounded">
+                    {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+                  </span>
+                </div>
               </div>
 
-              <div className="flex gap-2 w-full sm:w-auto flex-shrink-0">
+              {/* 링크 인풋 + 복사 버튼 */}
+              <div className="flex gap-2 w-full">
                 <input
                   readOnly
                   value={shareUrl}
                   onClick={(e) => (e.target as HTMLInputElement).select()}
-                  className="bg-[#f8fafd] border border-[#c4c7c5] rounded-xl px-3 py-2 text-xs font-mono flex-1 sm:w-72"
+                  className="bg-[#f8fafd] border border-[#c4c7c5] rounded-xl px-3 py-2 text-xs font-mono flex-1 min-w-0 truncate"
                 />
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="px-4 py-2 bg-[#0b57d0] hover:bg-[#0842a0] text-white text-xs font-medium rounded-xl transition shadow-sm whitespace-nowrap active:scale-95"
+                  className="px-3.5 sm:px-4 py-2 bg-[#0b57d0] hover:bg-[#0842a0] text-white text-xs font-medium rounded-xl transition shadow-sm whitespace-nowrap active:scale-95 flex-shrink-0"
                 >
                   {copied ? "복사됨" : "링크 복사"}
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-              <div className="p-3 bg-[#f8fafd] rounded-xl border border-[#e1e3e1]">
-                <div className="text-[10px] text-[#747775] uppercase">전송 속도 / 누적량</div>
-                <div className="text-sm font-semibold text-[#1f1f1f] mt-1">{speed}</div>
-                <div className="text-[11px] text-[#747775] mt-0.5">
+            {/* 텔레메트리 메트릭 그리드 (모바일 2열, PC 4열 대응) */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 text-xs font-mono">
+              <div className="p-3 bg-[#f8fafd] rounded-xl border border-[#e1e3e1] min-w-0">
+                <div className="text-[10px] text-[#747775] uppercase truncate">전송 속도 / 누적량</div>
+                <div className="text-sm font-semibold text-[#1f1f1f] mt-1 truncate">{speed}</div>
+                <div className="text-[11px] text-[#747775] mt-0.5 truncate">
                   총 {(telemetry.bytesSentTotal / 1024 / 1024).toFixed(2)} MB
                 </div>
               </div>
 
-              <div className="p-3 bg-[#f8fafd] rounded-xl border border-[#e1e3e1]">
-                <div className="text-[10px] text-[#747775] uppercase">수신자 공인 IP</div>
-                <div className="text-sm font-semibold text-[#1f1f1f] mt-1 truncate">
+              <div className="p-3 bg-[#f8fafd] rounded-xl border border-[#e1e3e1] min-w-0">
+                <div className="text-[10px] text-[#747775] uppercase truncate">수신자 공인 IP</div>
+                <div className="text-sm font-semibold text-[#1f1f1f] mt-1 truncate break-all">
                   {telemetry.publicIp}
                 </div>
                 <div className="text-[11px] text-[#747775] mt-0.5 truncate">
@@ -463,8 +475,8 @@ export default function SenderPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-[#f8fafd] rounded-xl border border-[#e1e3e1]">
-                <div className="text-[10px] text-[#747775] uppercase">수신자 위치 / ISP</div>
+              <div className="p-3 bg-[#f8fafd] rounded-xl border border-[#e1e3e1] min-w-0">
+                <div className="text-[10px] text-[#747775] uppercase truncate">수신자 위치 / ISP</div>
                 <div className="text-sm font-semibold text-[#0b57d0] mt-1 truncate">
                   {telemetry.location}
                 </div>
@@ -473,25 +485,26 @@ export default function SenderPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-[#f8fafd] rounded-xl border border-[#e1e3e1]">
-                <div className="text-[10px] text-[#747775] uppercase">왕복 지연시간 (RTT)</div>
-                <div className="text-sm font-semibold text-[#188038] mt-1">{telemetry.rtt}</div>
-                <div className="text-[11px] text-[#747775] mt-0.5">DTLS-SRTP 암호화</div>
+              <div className="p-3 bg-[#f8fafd] rounded-xl border border-[#e1e3e1] min-w-0">
+                <div className="text-[10px] text-[#747775] uppercase truncate">왕복 지연시간 (RTT)</div>
+                <div className="text-sm font-semibold text-[#188038] mt-1 truncate">{telemetry.rtt}</div>
+                <div className="text-[11px] text-[#747775] mt-0.5 truncate">DTLS 암호화</div>
               </div>
             </div>
 
+            {/* CMD 터미널 로그 콘솔: 모바일 줄바꿈 및 오버플로우 방지 */}
             <div className="space-y-1.5 pt-1">
-              <div className="flex items-center justify-between text-[11px] font-mono text-[#747775] px-1">
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-[#747775] px-1">
                 <span>TUNNEL TELEMETRY CONSOLE</span>
-                <span>REALTIME PACKET TRACKER</span>
+                <span>PACKET TRACKER</span>
               </div>
-              <div className="bg-[#0f1117] text-[#a5d6a7] font-mono text-[11px] p-4 rounded-2xl h-48 overflow-y-auto border border-[#2d3139] shadow-inner space-y-1">
+              <div className="bg-[#0f1117] text-[#a5d6a7] font-mono text-[10px] sm:text-[11px] p-3 sm:p-4 rounded-xl sm:rounded-2xl h-40 sm:h-48 overflow-y-auto border border-[#2d3139] shadow-inner space-y-1 w-full break-all">
                 {logs.length === 0 ? (
                   <div className="text-[#5c6370]">콘솔 로그 대기 중...</div>
                 ) : (
                   logs.map((log, idx) => (
-                    <div key={idx} className="leading-relaxed">
-                      <span className="text-[#61afef]">$</span> {log}
+                    <div key={idx} className="leading-relaxed whitespace-pre-wrap break-all">
+                      <span className="text-[#61afef] select-none">$</span> {log}
                     </div>
                   ))
                 )}
@@ -501,7 +514,7 @@ export default function SenderPage() {
           </div>
         )}
 
-        {/* 파일 업로드 드롭존 */}
+        {/* 3. 파일 업로드 드롭존 */}
         <div
           onDragOver={(e) => {
             e.preventDefault();
@@ -513,20 +526,20 @@ export default function SenderPage() {
             setIsDragOver(false);
             if (e.dataTransfer.files?.length) handleAddFiles(e.dataTransfer.files);
           }}
-          className={`border-2 border-dashed rounded-3xl p-8 text-center transition-all cursor-pointer ${
+          className={`border-2 border-dashed rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-center transition-all cursor-pointer ${
             isDragOver
               ? "border-[#0b57d0] bg-[#e8f0fe]"
               : "border-[#c4c7c5] hover:border-[#0b57d0] bg-white"
           }`}
         >
           <label className="cursor-pointer flex flex-col items-center">
-            <div className="w-12 h-12 rounded-full bg-[#f1f3f4] text-[#0b57d0] flex items-center justify-center mb-3">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#f1f3f4] text-[#0b57d0] flex items-center justify-center mb-2 sm:mb-3">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
             </div>
-            <span className="text-sm font-medium text-[#1f1f1f]">파일을 드래그하거나 클릭하여 추가</span>
-            <span className="text-xs text-[#747775] mt-0.5">다중 파일 선택 가능 (순차 큐 다운로드 보장)</span>
+            <span className="text-xs sm:text-sm font-medium text-[#1f1f1f]">파일을 드래그하거나 탭하여 추가</span>
+            <span className="text-[11px] sm:text-xs text-[#747775] mt-0.5">다중 파일 선택 가능 (순차 큐 다운로드 보장)</span>
             <input
               type="file"
               multiple
@@ -536,26 +549,26 @@ export default function SenderPage() {
           </label>
         </div>
 
-        {/* 파일 목록 카드 */}
+        {/* 4. 파일 목록 카드 */}
         {fileList.length > 0 && (
-          <div className="bg-white rounded-3xl border border-[#e1e3e1] shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-[#e1e3e1] flex items-center justify-between bg-[#f8fafd]">
-              <div className="text-xs font-medium text-[#444746]">
-                총 {fileList.length}개 파일 (선택 {selectedIds.length}개)
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#e1e3e1] shadow-sm overflow-hidden">
+            <div className="p-3 sm:p-4 border-b border-[#e1e3e1] flex items-center justify-between bg-[#f8fafd] gap-2">
+              <div className="text-xs font-medium text-[#444746] truncate">
+                파일 {fileList.length}개 (선택 {selectedIds.length}개)
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-1.5 sm:gap-2 flex-shrink-0">
                 <button
                   type="button"
                   onClick={handleDeleteSelected}
                   disabled={selectedIds.length === 0}
-                  className="px-3 py-1.5 rounded-lg border border-[#c4c7c5] bg-white text-xs font-medium text-[#b3261e] hover:bg-[#fdf2f2] disabled:opacity-40 transition"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#c4c7c5] bg-white text-xs font-medium text-[#b3261e] hover:bg-[#fdf2f2] disabled:opacity-40 transition"
                 >
                   선택 삭제
                 </button>
                 <button
                   type="button"
                   onClick={handleDeleteAll}
-                  className="px-3 py-1.5 rounded-lg border border-[#c4c7c5] bg-white text-xs font-medium text-[#444746] hover:bg-[#f1f3f4] transition"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#c4c7c5] bg-white text-xs font-medium text-[#444746] hover:bg-[#f1f3f4] transition"
                 >
                   전체 삭제
                 </button>
@@ -564,8 +577,8 @@ export default function SenderPage() {
 
             <div className="divide-y divide-[#e1e3e1]">
               {fileList.map((item) => (
-                <div key={item.id} className="p-4 flex items-center justify-between hover:bg-[#f8fafd] transition">
-                  <div className="flex items-center gap-3 min-w-0">
+                <div key={item.id} className="p-3 sm:p-4 flex items-center justify-between gap-3 hover:bg-[#f8fafd] transition">
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                     <input
                       type="checkbox"
                       checked={selectedIds.includes(item.id)}
@@ -576,13 +589,13 @@ export default function SenderPage() {
                           setSelectedIds((prev) => prev.filter((id) => id !== item.id));
                         }
                       }}
-                      className="w-4 h-4 rounded text-[#0b57d0] focus:ring-0"
+                      className="w-4 h-4 rounded text-[#0b57d0] focus:ring-0 flex-shrink-0"
                     />
-                    <div className="truncate">
-                      <div className="text-sm font-medium text-[#1f1f1f] truncate max-w-sm sm:max-w-md">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs sm:text-sm font-medium text-[#1f1f1f] truncate">
                         {item.file.name}
                       </div>
-                      <div className="text-xs text-[#747775]">
+                      <div className="text-[11px] sm:text-xs text-[#747775]">
                         {(item.file.size / 1024 / 1024).toFixed(2)} MB
                       </div>
                     </div>
@@ -597,7 +610,7 @@ export default function SenderPage() {
                         setTimeout(() => broadcastManifest(connRef.current!), 100);
                       }
                     }}
-                    className="text-xs text-[#747775] hover:text-[#b3261e] p-2 transition"
+                    className="text-xs text-[#747775] hover:text-[#b3261e] p-1.5 sm:p-2 transition flex-shrink-0"
                   >
                     삭제
                   </button>
@@ -614,7 +627,7 @@ export default function SenderPage() {
           {/* 상단 라인: 브랜드명 | 슬로건 | 문의 이메일 */}
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
             <span className="font-bold text-[#1f1f1f] text-sm">Direct Drive</span>
-            <span className="text-[#747775]">P2P File Share Platform</span>
+            <span className="text-[#747775]">Direct Drive</span>
             <span className="text-[#c4c7c5] select-none">|</span>
             <span>
               사이트 관련 문의 :{" "}

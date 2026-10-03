@@ -171,43 +171,50 @@ export default function ReceiverPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafd] text-[#1f1f1f] flex flex-col font-sans">
-      {/* 헤더: Send / Receive 전환 토글 버튼 */}
-      <header className="h-16 border-b border-[#e1e3e1] bg-white px-6 flex items-center justify-between sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#e8f0fe] text-[#0b57d0]">
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <div className="min-h-screen bg-[#f8fafd] text-[#1f1f1f] flex flex-col font-sans overflow-x-hidden">
+      <header className="h-16 border-b border-[#e1e3e1] bg-white px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center bg-[#e8f0fe] text-[#0b57d0] flex-shrink-0">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
             </svg>
           </div>
-          <div>
-            <span className="text-lg font-medium text-[#1f1f1f]">Direct Drive</span>
-            <span className="ml-2 text-xs font-mono px-2 py-0.5 rounded-full bg-[#e8f0fe] text-[#0b57d0] font-medium">Receive Mode</span>
+          <div className="truncate">
+            <span className="text-base sm:text-lg font-medium text-[#1f1f1f]">Direct Drive</span>
+            <span className="hidden xs:inline-block ml-1.5 sm:ml-2 text-[10px] sm:text-xs font-mono px-2 py-0.5 rounded-full bg-[#e8f0fe] text-[#0b57d0] font-medium">
+              Receive
+            </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center bg-[#f1f3f4] p-1 rounded-xl border border-[#e1e3e1]">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center bg-[#f1f3f4] p-0.5 sm:p-1 rounded-xl border border-[#e1e3e1]">
             <Link
               href="/"
-              className="px-3 py-1 text-[#444746] hover:text-[#1f1f1f] text-xs font-medium rounded-lg transition"
+              className="px-2.5 sm:px-3 py-1 text-[#444746] hover:text-[#1f1f1f] text-xs font-medium rounded-lg transition"
             >
               Send
             </Link>
-            <span className="px-3 py-1 bg-white text-[#0b57d0] text-xs font-semibold rounded-lg shadow-sm">
+            <span className="px-2.5 sm:px-3 py-1 bg-white text-[#0b57d0] text-xs font-semibold rounded-lg shadow-sm">
               Receive
             </span>
           </div>
 
-          <div className="hidden sm:block text-xs text-[#747775]">{status}</div>
+          <div className="hidden md:block text-xs text-[#747775]">{status}</div>
         </div>
       </header>
 
-      <main className="flex-1 max-w-4xl w-full mx-auto p-6 sm:p-10 space-y-6">
-        <div className="bg-white rounded-3xl border border-[#e1e3e1] shadow-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
+      <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
+        {/* 모바일 최적화 상태 바 */}
+        <div className="md:hidden text-xs text-[#747775] text-center bg-white border border-[#e1e3e1] py-2 px-3 rounded-xl shadow-xs">
+          {status}
+        </div>
+
+        {/* 코드 입력 카드 */}
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#e1e3e1] shadow-sm p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="min-w-0">
             <div className="text-sm font-semibold text-[#1f1f1f]">공유 코드 수동 입력</div>
-            <div className="text-xs text-[#747775] mt-0.5">상대방에게 전달받은 코드를 입력하여 방에 접속합니다.</div>
+            <div className="text-xs text-[#747775] mt-0.5 truncate">상대방에게 전달받은 코드를 입력하여 방에 접속합니다.</div>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <input
@@ -215,45 +222,46 @@ export default function ReceiverPage() {
               value={targetRoomId}
               onChange={(e) => setTargetRoomId(e.target.value)}
               placeholder="예: 5BsXye"
-              className="bg-[#f8fafd] border border-[#c4c7c5] rounded-xl px-3 py-2 text-xs font-mono w-40 text-center font-bold text-[#0b57d0] focus:outline-none focus:border-[#0b57d0]"
+              className="bg-[#f8fafd] border border-[#c4c7c5] rounded-xl px-3 py-2 text-xs font-mono flex-1 sm:w-40 text-center font-bold text-[#0b57d0] focus:outline-none focus:border-[#0b57d0] min-w-0"
             />
             <button
               type="button"
               onClick={() => connectToSender(targetRoomId)}
-              className="px-4 py-2 bg-[#0b57d0] hover:bg-[#0842a0] text-white text-xs font-medium rounded-xl transition shadow-sm whitespace-nowrap active:scale-95"
+              className="px-3.5 sm:px-4 py-2 bg-[#0b57d0] hover:bg-[#0842a0] text-white text-xs font-medium rounded-xl transition shadow-sm whitespace-nowrap active:scale-95 flex-shrink-0"
             >
               접속하기
             </button>
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl border border-[#e1e3e1] shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-[#e1e3e1] flex items-center justify-between bg-[#f8fafd]">
-            <div className="text-xs font-medium text-[#444746]">
-              공유 파일 목록 ({fileList.length}개)
+        {/* 파일 목록 컨테이너 */}
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-[#e1e3e1] shadow-sm overflow-hidden">
+          <div className="p-3 sm:p-4 border-b border-[#e1e3e1] flex items-center justify-between bg-[#f8fafd] gap-2">
+            <div className="text-xs font-medium text-[#444746] truncate">
+              목록 ({fileList.length}개)
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5 sm:gap-2 flex-shrink-0">
               <button
                 type="button"
                 onClick={handleDownloadSelected}
                 disabled={selectedIds.length === 0}
-                className="px-4 py-2 rounded-xl bg-[#0b57d0] text-white text-xs font-medium hover:bg-[#0842a0] disabled:opacity-40 transition shadow-sm"
+                className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-[#0b57d0] text-white text-xs font-medium hover:bg-[#0842a0] disabled:opacity-40 transition shadow-sm"
               >
-                선택 다운로드 ({selectedIds.length})
+                선택 ({selectedIds.length})
               </button>
               <button
                 type="button"
                 onClick={handleDownloadAll}
                 disabled={fileList.length === 0}
-                className="px-4 py-2 rounded-xl border border-[#c4c7c5] bg-white text-xs font-medium text-[#1f1f1f] hover:bg-[#f1f3f4] disabled:opacity-40 transition"
+                className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-[#c4c7c5] bg-white text-xs font-medium text-[#1f1f1f] hover:bg-[#f1f3f4] disabled:opacity-40 transition"
               >
-                전체 다운로드
+                전체 받기
               </button>
             </div>
           </div>
 
           {fileList.length === 0 ? (
-            <div className="p-12 text-center text-sm text-[#747775]">
+            <div className="p-8 sm:p-12 text-center text-xs sm:text-sm text-[#747775]">
               {activeRoomId ? "공유된 파일이 없거나 송신자가 목록을 비웠습니다." : "상단의 공유 코드를 입력하고 접속해 주세요."}
             </div>
           ) : (
@@ -261,8 +269,8 @@ export default function ReceiverPage() {
               {fileList.map((file) => {
                 const transfer = transfers[file.id];
                 return (
-                  <div key={file.id} className="p-4 flex items-center justify-between hover:bg-[#f8fafd] transition">
-                    <div className="flex items-center gap-3 min-w-0">
+                  <div key={file.id} className="p-3 sm:p-4 flex items-center justify-between gap-3 hover:bg-[#f8fafd] transition">
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                       <input
                         type="checkbox"
                         checked={selectedIds.includes(file.id)}
@@ -273,38 +281,38 @@ export default function ReceiverPage() {
                             setSelectedIds((prev) => prev.filter((id) => id !== file.id));
                           }
                         }}
-                        className="w-4 h-4 rounded text-[#0b57d0] focus:ring-0"
+                        className="w-4 h-4 rounded text-[#0b57d0] focus:ring-0 flex-shrink-0"
                       />
-                      <div className="truncate">
-                        <div className="text-sm font-medium text-[#1f1f1f] truncate max-w-xs sm:max-w-md">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs sm:text-sm font-medium text-[#1f1f1f] truncate">
                           {file.name}
                         </div>
-                        <div className="text-xs text-[#747775]">
+                        <div className="text-[11px] sm:text-xs text-[#747775] truncate">
                           {(file.size / 1024 / 1024).toFixed(2)} MB
-                          {transfer && !transfer.done && ` • ${transfer.progress}% 받는 중`}
-                          {transfer?.done && ` • 다운로드 완료`}
+                          {transfer && !transfer.done && ` • ${transfer.progress}%`}
+                          {transfer?.done && ` • 완료`}
                         </div>
                       </div>
                     </div>
 
-                    <div>
+                    <div className="flex-shrink-0">
                       {transfer?.done ? (
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-medium text-[#188038] px-2.5 py-1 bg-[#e6f4ea] rounded-lg">
-                            완료됨
+                          <span className="text-[11px] sm:text-xs font-medium text-[#188038] px-2 sm:px-2.5 py-1 bg-[#e6f4ea] rounded-lg">
+                            완료
                           </span>
                           {transfer.blobUrl && (
                             <a
                               href={transfer.blobUrl}
                               download={file.name}
-                              className="text-xs text-[#0b57d0] hover:underline"
+                              className="text-[11px] sm:text-xs text-[#0b57d0] hover:underline"
                             >
-                              다시 저장
+                              저장
                             </a>
                           )}
                         </div>
                       ) : transfer && !transfer.done ? (
-                        <div className="w-24 bg-[#e1e3e1] h-1.5 rounded-full overflow-hidden">
+                        <div className="w-16 sm:w-24 bg-[#e1e3e1] h-1.5 rounded-full overflow-hidden">
                           <div
                             className="bg-[#0b57d0] h-full transition-all duration-150"
                             style={{ width: `${transfer.progress}%` }}
@@ -314,9 +322,9 @@ export default function ReceiverPage() {
                         <button
                           type="button"
                           onClick={() => triggerDownload(file.id)}
-                          className="px-3.5 py-1.5 bg-[#f1f3f4] hover:bg-[#e8f0fe] hover:text-[#0b57d0] text-[#1f1f1f] text-xs font-medium rounded-lg transition"
+                          className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 bg-[#f1f3f4] hover:bg-[#e8f0fe] hover:text-[#0b57d0] text-[#1f1f1f] text-xs font-medium rounded-lg transition"
                         >
-                          다운로드
+                          받기
                         </button>
                       )}
                     </div>
@@ -334,7 +342,7 @@ export default function ReceiverPage() {
           {/* 상단 라인: 브랜드명 | 슬로건 | 문의 이메일 */}
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
             <span className="font-bold text-[#1f1f1f] text-sm">Direct Drive</span>
-            <span className="text-[#747775]">P2P File Share Platform</span>
+            <span className="text-[#747775]">Direct Drive</span>
             <span className="text-[#c4c7c5] select-none">|</span>
             <span>
               사이트 관련 문의 :{" "}
