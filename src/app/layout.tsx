@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "P2P File Transfer Protocol",
+  title: "Direct Drive",
   description: "End-to-End Encrypted 10-Minute Ephemeral File Tunnel",
 };
 
